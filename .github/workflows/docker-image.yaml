@@ -1,6 +1,17 @@
-name: build docker image
+name: Build Docker Image
 
-on: 
+on:
   push:
     branches:
       - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: echo "🚧 Placeholder: Build logic here"
