@@ -6,9 +6,13 @@ on:
 permissions:
   contents: write
 
+      
 jobs:
   job_1:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.set_tag.outputs.tag }}
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4.2.2
@@ -21,28 +25,30 @@ jobs:
 
       - name: Set Docker tag
         id: set_tag
-        run: echo "TAG=build-${{ github.run_number }}" >> $GITHUB_ENV
-
+        run: echo "TAG=build-${{ github.run_number }}" >> $GITHUB_OUTPUT
+  
       - name: Build Docker image
-        run: docker build -t labazizlab/pyflash:${{ env.TAG }} ./pro
+        run: docker build -t labazizlab/pyflash:${{ steps.set_tag.outputs.tag }} ./pro
 
       - name: Push Docker image
-        run: docker push labazizlab/pyflash:${{ env.TAG }}
+        run: docker push labazizlab/pyflash:${{ steps.set_tag.outputs.tag }}
 
       - name: Output image tag
-        run: echo "Image tag is ${{ env.TAG }}"
+        run: echo "Image tag is ${{ steps.set_tag.outputs.tag }}"
 
   job_2:
     runs-on: ubuntu-latest
     needs: job_1
-
+    env:
+      TAG: ${{ needs.job_1.outputs.tag }}
+    
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4.2.2
 
       - name: Update deployment YAML with new build ID
         run: |
-          sed -i "s/image: labazizlab\/pyflash:.*/image: labazizlab\/pyflash:${{ env.TAG }}/" ./k3s/deploy-py.yaml
+          sed -i "s|labazizlab/pyflash:.*|labazizlab/pyflash:${{ env.TAG }}/" ./k3s/deploy-py.yaml
 
       - name: Commit changes
         run: |
@@ -50,4 +56,10 @@ jobs:
           git config user.email "actions@github.com"
           git add ./k3s/deploy-py.yaml
           git commit -m "Update deployment to use image ${{ env.TAG }}"
-          git push
+          git push origin main
+
+
+
+
+
+
