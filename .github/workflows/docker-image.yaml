@@ -2,7 +2,10 @@ name: run manual
 
 on:
   workflow_dispatch:
-      
+
+permissions:
+  contents: write
+
 jobs:
   job_1:
     runs-on: ubuntu-latest
