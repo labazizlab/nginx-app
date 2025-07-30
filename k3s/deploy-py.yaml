@@ -15,6 +15,6 @@ spec:
     spec:
       containers:
         - name: pyflask
-          image: labazizlab/pyflash:v1.6
+          image: labazizlab/pyflash:build-PLACHOLDER
           ports:
             - containerPort: 5000
