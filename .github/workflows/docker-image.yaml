@@ -1,17 +1,15 @@
-name: Build and Push Docker Image
+name: run manual
 
 on:
-  push:
-    branches:
-      - main
-
+  workflow_dispatch:
+      
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4.2.2
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
