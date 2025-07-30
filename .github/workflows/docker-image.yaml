@@ -4,21 +4,8 @@ on:
   workflow_dispatch:
       
 jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4.2.2
-name: Build, Push, and Update Deployment
-
-on:
-  workflow_dispatch:
-
-jobs:
   job_1:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4.2.2
@@ -33,9 +20,6 @@ jobs:
         id: set_tag
         run: echo "TAG=build-${{ github.run_number }}" >> $GITHUB_ENV
 
-    - name: Build Docker image
-      run: |
-        docker build -t labazizlab/pyflash:${{ env.TAG }} ./pro
       - name: Build Docker image
         run: docker build -t labazizlab/pyflash:${{ env.TAG }} ./pro
 
