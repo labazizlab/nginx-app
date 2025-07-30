@@ -48,7 +48,7 @@ jobs:
 
       - name: Update deployment YAML with new build ID
         run: |
-          sed -i "s|labazizlab/pyflash:.*|labazizlab/pyflash:${{ env.TAG }}/" ./k3s/deploy-py.yaml
+          sed -i "s#labazizlab/pyflash:.*#labazizlab/pyflash:${{ env.TAG }}#" ./k3s/deploy-py.yaml
 
       - name: Commit changes
         run: |
@@ -57,9 +57,3 @@ jobs:
           git add ./k3s/deploy-py.yaml
           git commit -m "Update deployment to use image ${{ env.TAG }}"
           git push origin main
-
-
-
-
-
-
