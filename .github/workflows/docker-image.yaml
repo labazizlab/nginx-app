@@ -23,7 +23,7 @@ jobs:
 
     - name: Build Docker image
       run: |
-        docker build -t labazizlab/pyflash:${{ env.TAG }} .
+        docker build -t labazizlab/pyflash:${{ env.TAG }} ./code
 
     - name: Push Docker image
       run: |
