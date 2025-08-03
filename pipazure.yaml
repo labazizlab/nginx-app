@@ -46,3 +46,13 @@ stages:
         echo "Updating Kubernetes deployment YAML"
         sed -i "s#\(labazizlab/pyflash:\).*#\1${tag}#g" ./k3s/deploy-py.yaml
       displayName: 'Update deployment YAML'
+    - script: |
+        git config --global user.email "202021016@aaa.com"
+        git config --global user.name "labazizlab"
+        git checkout main
+        git add ./k3s/deploy-py.yaml
+        git commit -m "Update deploy-py.yaml to tag: $(tag)"
+        git push https://$(GITHUB_USERNAME):$(GITHUB_TOKEN)@github.com/labazizlab/nginx-app.git HEAD:main
+      displayName: 'Commit and Push Updated YAML'
+
+
