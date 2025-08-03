@@ -14,8 +14,7 @@ stages:
   jobs:
   - job: BuildImage
     displayName: 'Build Docker Image'
-    outputs:
-      buildTag: $[ dependencies.BuildImage.outputs['SetTag.buildTag'] ]
+
     steps:
     - checkout: self
  
