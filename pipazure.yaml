@@ -50,8 +50,8 @@ stages:
     - script: |
         git config --global user.email "202021016@fbsu.edu.sa"
         git config --global user.name "labazizlab"
-        git add ./k3s/deploy-py.yaml
-        git commit -m "update deploy tag to $tag"
-        git pull
-        git push
-      displayName: 'Push updated YAML to GitHub
+        git pull origin main || true
+        git add ./k3s/deploy-py.yaml || echo "No file to add"
+        git diff --staged --quiet || git commit -m "update deploy tag to $(tag)"
+        git push https://$(GITHUB_USERNAME):$(GITHUB_TOKEN)@github.com/labazizlab/nginx-app.git HEAD:main
+      displayName: 'Push updated YAML to GitHub'
