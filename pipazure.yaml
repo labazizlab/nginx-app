@@ -4,10 +4,8 @@ pool:
   name: local-pool
 
 variables:
-  DOCKER_USERNAME: $(DOCKER_USERNAME)
-  DOCKER_PASSWORD: $(DOCKER_PASSWORD)
-  GITHUB_USERNAME: $(GITHUB_USERNAME)
-  GITHUB_TOKEN: $(GITHUB_TOKEN)
+- group: New variable group 31-Jul
+
   IMAGE_NAME: labazizlab/pyflash
   DEPLOYMENT_FILE: ./k3s/deploy-py.yaml
 
