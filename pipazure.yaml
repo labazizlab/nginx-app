@@ -44,16 +44,17 @@ stages:
     - script: |
         echo "Updating Kubernetes deployment YAML"
         sed -i "s#\(labazizlab/pyflash:\).*#\1${tag}#g" ./k3s/deploy-py.yaml
-      displayName: 'Update deployment YAML'
-
-    - script: |
-        git config --global user.email "202021016@fbsu.edu.sa"
-        git config --global user.name "labazizlab"
+ - task: CmdLine@2
+   displayName: 'Push updated YAML to GitHub'
+    inputs:
+      script: |
+        git config --global user.email "20202016@fbsu.edu.sa"
+        git config --global user.name "$(GITHUB_USERNAME)"
         git add .
-        git commit -m "updateid"
+        git commit -m "updated deployment"
         git pull origin main
         git push https://$(GITHUB_USERNAME):$(GITHUB_TOKEN)@github.com/labazizlab/nginx-app.git HEAD:main
-      displayName: 'Push updated YAML to GitHub'
-      env:
-        GITHUB_USERNAME: $(GITHUB_USERNAME)
-        GITHUB_TOKEN: $(GITHUB_TOKEN)
+      failOnStderr: false
+    env:
+      GITHUB_USERNAME: $(GITHUB_USERNAME)
+      GITHUB_TOKEN: $(GITHUB_TOKEN)
