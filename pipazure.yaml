@@ -51,7 +51,7 @@ steps:
       sed -i "s|image:.*$|image: $(IMAGE_NAME):$(BUILD_ID)|" $(DEPLOYMENT_FILE)
       echo "Updated deployment file with image: $(IMAGE_NAME):$(BUILD_ID)"
 
-      git config --global user.email "20202016@fbsu.edu.sa"
+      git config --global user.email "202021016@fbsu.edu.sa"
       git config --global user.name "labazizlab"
       git remote set-url origin https://$(GITHUB_USERNAME):$(GITHUB_TOKEN)@github.com/labazizlab/nginx-app.git
       git pull origin main
