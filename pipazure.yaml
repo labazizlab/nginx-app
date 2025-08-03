@@ -38,7 +38,7 @@ stages:
   - job: UpdateYAML
     displayName: 'Update and Push YAML'
     variables:
-      tag: $[ dependencies.BuildAndPush.outputs['SetTag.buildTag'] ]
+      tag: $[ dependencies.BuildAndPush.outputs['BuildImage.SetTag.buildTag'] ]
     steps:
     - checkout: self
       fetchDepth: 0
