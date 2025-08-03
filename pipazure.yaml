@@ -14,6 +14,8 @@ stages:
   jobs:
     - job: BuildImage
       displayName: 'Build Docker Image'
+      outputs:
+        buildTag: $(buildTag)
       steps:
         - checkout: self
 
