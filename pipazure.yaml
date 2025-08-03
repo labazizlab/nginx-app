@@ -52,6 +52,6 @@ stages:
         git config --global user.name "labazizlab"
         git add ./k3s/deploy-py.yaml
         git commit -m "update deploy tag to $tag"
-        git pull origin main
-        git push origin main
+        git pull
+        git push
       displayName: 'Push updated YAML to GitHub
