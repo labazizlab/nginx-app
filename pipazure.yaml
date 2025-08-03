@@ -30,6 +30,7 @@ stages:
         - script: echo "##vso[task.setvariable variable=buildTag;isOutput=true]build-$(Build.BuildId)"
           name: SetTag
           displayName: 'Set build tag as output'
+
 - stage: UpdateYAML
   displayName: 'Update K8s YAML and Push'
   dependsOn: BuildAndPush
@@ -37,22 +38,13 @@ stages:
   - job: UpdateYAML
     displayName: 'Update and Push YAML'
     variables:
-      tag: $[ dependencies.BuildAndPush.outputs['BuildImage.SetTag.buildTag'] ]
+      tag: $[ dependencies.BuildAndPush.outputs['SetTag.buildTag'] ]
     steps:
     - checkout: self
       fetchDepth: 0
 
     - script: |
-        echo "Updating Kubernetes deployment YAML"
-        sed -i "s#\(labazizlab/pyflash:\).*#\1${tag}#g" ./k3s/deploy-py.yaml
-      displayName: 'Update deployment YAML'
-    - script: |
-        git config --global user.email "202021016@aaa.com"
-        git config --global user.name "labazizlab"
-        git checkout main
-        git add ./k3s/deploy-py.yaml
-        git commit -m "Update deploy-py.yaml to tag: $(tag)"
-        git push https://$(GITHUB_USERNAME):$(GITHUB_TOKEN)@github.com/labazizlab/nginx-app.git HEAD:main
-      displayName: 'Commit and Push Updated YAML'
-
-
+        echo "Updating K3s deployment YAML"
+        echo "using tag: $(tag)"
+        sed -i "s#labazizlab/pyflash:.*#labazizlab/pyflash:$(tag)#g" /k3s/deploy-py.yaml
+      displayName: 'Update deployment yaml'
