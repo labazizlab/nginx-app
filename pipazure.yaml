@@ -4,16 +4,14 @@ pool:
   name: local-pool
 
 variables:
-- group: New variable group 31-Jul
-
-- name: IMAGE_NAME 
-  value: labazizlab/pyflash
-
-- name: DEPLOYMENT_FILE 
-  value: ./k3s/deploy-py.yaml
+  DOCKER_USERNAME: $(DOCKER_USERNAME)
+  DOCKER_PASSWORD: $(DOCKER_PASSWORD)
+  GITHUB_USERNAME: $(GITHUB_USERNAME)
+  GITHUB_TOKEN: $(GITHUB_TOKEN)
+  IMAGE_NAME: labazizlab/pyflash
+  DEPLOYMENT_FILE: ./k3s/deploy-py.yaml
 
 steps:
-
 - checkout: self
 
 - task: Bash@3
@@ -22,45 +20,32 @@ steps:
   inputs:
     targetType: 'inline'
     script: |
-      build_id=$(date +%s)
-      echo "##vso[task.setvariable variable=BUILD_ID]$build_id"
-      echo "Build ID: $build_id"
+      echo "##vso[task.setvariable variable=BUILD_ID]$(date +%s)"
 
 - task: Bash@3
-  displayName: 'Build Docker Image'
+  displayName: 'Login & Push Docker Image'
   inputs:
     targetType: 'inline'
     script: |
-      docker build -t $(IMAGE_NAME):$(BUILD_ID) -f ./pro/Dockerfile ./pro
-      echo "Image built: $(IMAGE_NAME):$(BUILD_ID)"
-
-- task: Bash@3
-  displayName: 'Push Docker Image'
-  inputs:
-    targetType: 'inline'
-    script: |
-      echo $(DOCKER_PASSWORD) | docker login -u $(DOCKER_USERNAME) --password-stdin
-      docker push $(IMAGE_NAME):$(BUILD_ID)
+      docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+      docker build -t $IMAGE_NAME:$(BUILD_ID) .
+      docker push $IMAGE_NAME:$(BUILD_ID)
 
 - task: Bash@3
   displayName: 'Update deployment.yaml with new tag'
-  env: 
-    GITHUB_USERNAME: $(GITHUB_USERNAME)
-    GITHUB_TOKEN: $(GITHUB_TOKEN)
   inputs:
     targetType: 'inline'
     script: |
       set -e
-      sed -i "s|image:.*$|image: $(IMAGE_NAME):$(BUILD_ID)|" $(DEPLOYMENT_FILE)
-      echo "Updated deployment file with image: $(IMAGE_NAME):$(BUILD_ID)"
+      sed -i "s|image:.*|image: ${IMAGE_NAME}:${BUILD_ID}|" ${DEPLOYMENT_FILE}
+      echo "Updated deployment file with image: ${IMAGE_NAME}:${BUILD_ID}"
 
       git config --global user.email "202021016@fbsu.edu.sa"
       git config --global user.name "labazizlab"
-      git remote set-url origin https://$(GITHUB_USERNAME):$(GITHUB_TOKEN)@github.com/labazizlab/nginx-app.git
-      
+      git remote set-url origin https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/nginx-app.git
+
       git checkout main
       git pull origin main
-      
-      git add $(DEPLOYMENT_FILE)
-      git commit -m "Update image to $(BUILD_ID)"
+      git add ${DEPLOYMENT_FILE}
+      git commit -m "Update image to ${BUILD_ID}"
       git push origin main
