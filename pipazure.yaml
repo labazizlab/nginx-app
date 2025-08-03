@@ -51,6 +51,6 @@ stages:
         git config --global user.email "202021016@fbsu.edu.sa"
         git config --global user.name "labazizlab"
         git add ./k3s/deploy-py.yaml
-        git commit -m "update deploy tag to $(tag)"
+        git commit -m "update deploy tag to $tag"
         git push origin main
       displayName: 'Push updated YAML to GitHub
