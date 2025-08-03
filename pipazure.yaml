@@ -54,3 +54,6 @@ stages:
         git diff --staged --quiet || git commit -m "update deploy tag to $(tag)"
         git push https://$(GITHUB_USERNAME):$(GITHUB_TOKEN)@github.com/labazizlab/nginx-app.git HEAD:main
       displayName: 'Push updated YAML to GitHub'
+      env:
+        GITHUB_USERNAME: $(GITHUB_USERNAME)
+        GITHUB_TOKEN: $(GITHUB_TOKEN)
