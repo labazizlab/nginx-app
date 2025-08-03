@@ -6,8 +6,11 @@ pool:
 variables:
 - group: New variable group 31-Jul
 
-  IMAGE_NAME: labazizlab/pyflash
-  DEPLOYMENT_FILE: ./k3s/deploy-py.yaml
+- name: IMAGE_NAME 
+  value: labazizlab/pyflash
+
+- name: DEPLOYMENT_FILE 
+  value: ./k3s/deploy-py.yaml
 
 steps:
 
