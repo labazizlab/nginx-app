@@ -1,46 +1,48 @@
 trigger: none
 
 pool:
-  name: local-pool
+  name: 'local-pool'
 
 variables:
-- group: New variable group 31-Jul
+  - group: New variable group 03-Aug
+  - name: imageName
+    value: 'labazizlab/pyflash'
 
-steps:
-- checkout: self
+stages:
+- stage: BuildAndPush
+  displayName: 'Build and Push Docker Image'
+  jobs:
+    - job: BuildImage
+      displayName: 'Build Docker Image'
+      steps:
+        - checkout: self
 
-- task: Bash@3
-  displayName: 'Get Build ID'
-  name: getBuild
-  inputs:
-    targetType: 'inline'
-    script: |
-      echo "##vso[task.setvariable variable=BUILD_ID]$(date +%s)"
+        - task: Docker@2
+          displayName: 'Build Docker Image'
+          inputs:
+            containerRegistry: 'dockerhub-connection'
+            repository: $(imageName)
+            command: buildAndPush
+            dockerfile: pro/Dockerfile
+            buildContext: pro
+            tags: build-$(Build.BuildId)
 
-- task: Bash@3
-  displayName: 'Login & Push Docker Image'
-  inputs:
-    targetType: 'inline'
-    script: |
-      docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-      docker build -t $IMAGE_NAME:$(BUILD_ID) .
-      docker push $IMAGE_NAME:$(BUILD_ID)
+        - script: echo "##vso[task.setvariable variable=buildTag;isOutput=true]build-$(Build.BuildId)"
+          name: SetTag
+          displayName: 'Set build tag as output'
+- stage: UpdateYAML
+  displayName: 'Update K8s YAML and Push'
+  dependsOn: BuildAndPush
+  jobs:
+  - job: UpdateYAML
+    displayName: 'Update and Push YAML'
+    variables:
+      tag: $[ dependencies.BuildAndPush.outputs['BuildImage.SetTag.buildTag'] ]
+    steps:
+    - checkout: self
+      fetchDepth: 0
 
-- task: Bash@3
-  displayName: 'Update deployment.yaml with new tag'
-  inputs:
-    targetType: 'inline'
-    script: |
-      set -e
-      sed -i "s|image:.*|image: ${IMAGE_NAME}:${BUILD_ID}|" ${DEPLOYMENT_FILE}
-      echo "Updated deployment file with image: ${IMAGE_NAME}:${BUILD_ID}"
-
-      git config --global user.email "202021016@fbsu.edu.sa"
-      git config --global user.name "labazizlab"
-      git remote set-url origin https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/nginx-app.git
-
-      git checkout main
-      git pull origin main
-      git add ${DEPLOYMENT_FILE}
-      git commit -m "Update image to ${BUILD_ID}"
-      git push origin main
+    - script: |
+        echo "Updating Kubernetes deployment YAML"
+        sed -i "s#\(labazizlab/pyflash:\).*#\1${tag}#g" ./k3s/deploy-py.yaml
+      displayName: 'Update deployment YAML'
