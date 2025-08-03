@@ -57,8 +57,10 @@ steps:
       git config --global user.email "202021016@fbsu.edu.sa"
       git config --global user.name "labazizlab"
       git remote set-url origin https://$(GITHUB_USERNAME):$(GITHUB_TOKEN)@github.com/labazizlab/nginx-app.git
+      
       git checkout main
       git pull origin main
+      
       git add $(DEPLOYMENT_FILE)
       git commit -m "Update image to $(BUILD_ID)"
       git push origin main
