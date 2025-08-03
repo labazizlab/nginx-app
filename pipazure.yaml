@@ -46,5 +46,5 @@ stages:
     - script: |
         echo "Updating K3s deployment YAML"
         echo "using tag: $(tag)"
-        sed -i "s#labazizlab/pyflash:.*#labazizlab/pyflash:$(tag)#g" /k3s/deploy-py.yaml
+        sed -i "s#labazizlab/pyflash:.*#labazizlab/pyflash:$(tag)#g" k3s/deploy-py.yaml
       displayName: 'Update deployment yaml'
