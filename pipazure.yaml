@@ -5,9 +5,7 @@ pool:
 
 variables:
   - group: New variable group 03-Aug
-  - name: imageName
-    value: 'labazizlab/pyflash'
-
+  - group: New variable group 31-Jul
 stages:
 - stage: BuildAndPush
   displayName: 'Build and Push Docker Image'
