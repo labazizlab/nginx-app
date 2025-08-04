@@ -14,10 +14,12 @@ stages:
   jobs:
   - job: BuildImage
     displayName: 'Build Docker Image'
+    outputs:
+      buildTag: BuildImage.SetTag.buildTag
 
     steps:
     - checkout: self
- 
+
     - task: Docker@2
       displayName: 'Build Docker Image'
       inputs:
@@ -31,21 +33,31 @@ stages:
     - script: echo "##vso[task.setvariable variable=buildTag;isOutput=true]build-$(Build.BuildId)"
       name: SetTag
       displayName: 'Set build tag as output'
-  
+
 - stage: UpdateYAML
   displayName: 'Update K8s YAML and Push'
   dependsOn: BuildAndPush
   jobs:
-    - job: UpdateYAML
-      displayName: 'Update and Push YAML'
-      variables:
-        tag: $[ dependencies.BuildAndPush.outputs['BuildImage.buildTag'] ]
-      steps:
-        - checkout: self
-          fetchDepth: 0
+  - job: UpdateYAML
+    displayName: 'Update and Push YAML'
+    variables:
+      tag: $[ dependencies.BuildAndPush.outputs['BuildImage.buildTag'] ]
+    steps:
+    - checkout: self
+      fetchDepth: 0
+      persistCredentials: true   # Needed to push changes back to repo
 
-        - script: |
-            echo "Updating K3s deployment YAML"
-            echo "using tag: ${tag}"
-            sed -i -E "s#(labazizlab/pyflash)(:[a-zA-Z0-9._-]*)?#\1:${tag}#g" k3s/deploy-py.yaml
-          displayName: 'Update deployment yaml'
+    - script: |
+        echo "Updating K3s deployment YAML"
+        echo "Using tag: ${tag}"
+        sed -i -E "s#(labazizlab/pyflash)(:[a-zA-Z0-9._-]*)?#\1:${tag}#g" k3s/deploy-py.yaml
+      displayName: 'Update deployment yaml'
+
+    - script: |
+        git config user.name "Azure Pipelines"
+        git config user.email "azure-pipelines@devops"
+        git add k3s/deploy-py.yaml
+        git commit -m "Update deploy-py.yaml with image tag ${tag}"
+        git push
+      displayName: 'Commit and Push updated YAML'
+
