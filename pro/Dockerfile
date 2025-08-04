@@ -2,9 +2,9 @@ FROM python:latest
 
 WORKDIR /app
 
-COPY requirments.txt .
+COPY requirements.txt .
 
-RUN pip install -r requirments.txt
+RUN pip install -r requirements.txt
 
 COPY hello.py .
 
