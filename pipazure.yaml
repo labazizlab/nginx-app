@@ -52,10 +52,13 @@ stages:
       displayName: 'Update Deployment YAML'
 
     - script: |
+        BRANCH_NAME=$(echo $(Build.SourceBranch) | sed 's#refs/heads/##')
+        echo "Checking out branch: $BRANCH_NAME"
+        git checkout $BRANCH_NAME
         git config user.name "labazizlab"
         git config user.email "202021016@fbsu.edu.sa"
         git add k3s/deploy-py.yaml
-        git commit -m "Update deploy-py.yaml with image tag ${tag}"
-        git push
+        git commit -m "Update deploy-py.yaml with image tag ${tag}" || echo "No changes to commit"
+        git push origin $BRANCH_NAME
       displayName: 'Commit and Push Updated YAML'
 
